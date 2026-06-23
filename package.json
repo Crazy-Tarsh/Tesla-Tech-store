@@ -1,0 +1,21 @@
+{
+  "name": "tesla-premium-tech-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TESLA premium ecommerce platform for high-end electronics, smart devices, gaming gear, AI gadgets, and accessories.",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --workspace server run dev\" \"npm --workspace client run dev\"",
+    "client": "npm --workspace client run dev",
+    "server": "npm --workspace server run dev",
+    "build": "npm --workspace client run build",
+    "start": "npm --workspace server start",
+    "seed": "npm --workspace server run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
