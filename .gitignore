@@ -8,3 +8,7 @@ uploads
 *.local
 .codex
 .agents
+
+# Docker
+volumes
+mongodb_data

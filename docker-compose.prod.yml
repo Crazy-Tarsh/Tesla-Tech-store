@@ -1,0 +1,63 @@
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: tesla_marketplace
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-changeme}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - tesla-network
+    restart: always
+
+  server:
+    image: ${DOCKERHUB_USERNAME:-myrepo}/tesla-server:${IMAGE_TAG:-latest}
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://${MONGODB_ROOT_USER:-admin}:${MONGODB_ROOT_PASSWORD:-changeme}@mongodb:27017/tesla_marketplace?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:?error: JWT_SECRET not set}
+      - JWT_EXPIRES_IN=1d
+      - COOKIE_EXPIRES_DAYS=1
+      - SESSION_TIMEOUT_MINUTES=30
+      - CLIENT_URL=${CLIENT_URL:-http://localhost:3000}
+    networks:
+      - tesla-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  client:
+    image: ${DOCKERHUB_USERNAME:-myrepo}/tesla-client:${IMAGE_TAG:-latest}
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - tesla-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  tesla-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
