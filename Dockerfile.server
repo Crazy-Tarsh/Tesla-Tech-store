@@ -1,0 +1,28 @@
+# Server Dockerfile at root - Railway will find it
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY server/package*.json ./
+
+RUN npm install --omit=dev
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+COPY --chown=nodejs:nodejs server/src ./src
+COPY --chown=nodejs:nodejs server/package*.json ./
+
+USER nodejs
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 5000) + '/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+
+EXPOSE 5000
+
+CMD ["node", "src/server.js"]

@@ -1,0 +1,27 @@
+{
+  "services": {
+    "server": {
+      "builder": "dockerfile",
+      "dockerfile": "Dockerfile.server",
+      "startCommand": "node src/server.js",
+      "restartPolicyType": "on_failure",
+      "restartPolicyMaxRetries": 5,
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "5000",
+        "MONGODB_URI": "",
+        "JWT_SECRET": "",
+        "CLIENT_URL": ""
+      }
+    },
+    "client": {
+      "builder": "dockerfile",
+      "dockerfile": "Dockerfile.client",
+      "restartPolicyType": "on_failure",
+      "restartPolicyMaxRetries": 5,
+      "variables": {
+        "VITE_API_URL": ""
+      }
+    }
+  }
+}
