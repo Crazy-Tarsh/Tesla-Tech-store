@@ -39,6 +39,23 @@ Frontend: `http://localhost:5173`
 
 Backend: `http://localhost:5000`
 
+## Deployment Environment Variables
+
+`.env` files are intentionally ignored and are not uploaded to GitHub. In your hosting provider, add these environment variables manually:
+
+```env
+NODE_ENV=production
+PORT=5000
+CLIENT_URL=https://your-frontend-domain.com
+MONGODB_URI=mongodb+srv://tarshanvivek_db_user:<db_password>@cluster0.53oamx1.mongodb.net/tesla_marketplace?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=use-a-long-random-secret
+JWT_EXPIRES_IN=1d
+COOKIE_EXPIRES_DAYS=1
+SESSION_TIMEOUT_MINUTES=30
+```
+
+Replace `<db_password>` with your real MongoDB Atlas database password. If your password contains special characters such as `@`, `#`, `/`, `:`, or `%`, URL-encode it before putting it in `MONGODB_URI`.
+
 ## Seed Accounts
 
 - Admin: `admin@tesla.shop` / `Admin@12345`
